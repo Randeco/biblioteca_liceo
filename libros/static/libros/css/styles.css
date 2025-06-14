@@ -1,0 +1,75 @@
+/* Estilos para el hero section */
+.hero-section {
+    background: url('../img/biblioteca-bg.jpg') no-repeat center center;
+    background-size: cover;
+    height: 60vh;
+    position: relative;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+/* Estilos para las portadas de libros */
+.book-cover {
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f9fa;
+}
+
+.book-cover img {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+.book-cover i {
+    font-size: 3rem;
+    color: #6c757d;
+}
+
+/* Estilos para la sección hero */
+.hero-section {
+    background: url('../img/estanteria.jpg') no-repeat center center fixed;
+    background-size: cover;
+    min-height: 60vh;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* Ajusta este valor para más/menos oscuridad */
+}
+
+.table-responsive-custom { /* Clase personalizada para la tabla */
+    max-height: 400px; /* Ajusta la altura máxima según tus necesidades */
+    overflow-y: auto; /* Muestra la barra de desplazamiento vertical cuando sea necesario */
+}
+
+.table-responsive-custom thead th {
+    position: sticky; /* Fija el encabezado en la parte superior al hacer scroll */
+    top: 0;
+    background-color: white; /* O el color de fondo de tu tabla */
+    z-index: 1; /* Asegura que el encabezado esté por encima del contenido al hacer scroll */
+}
+
+.footer {
+    background-color: #f8f9fa; /* Un color de fondo para el footer */
+    padding: 20px;
+    text-align: center;
+    /* Otros estilos que desees para tu footer */
+}
+

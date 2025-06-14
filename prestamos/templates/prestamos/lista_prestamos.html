@@ -1,0 +1,333 @@
+{% extends 'libros/base.html' %}
+{% load static %}
+
+{% block head %}
+    {{ block.super }}
+    <script src="{% static 'prestamos/prestamos.js' %}"></script>
+    <meta name="theme-color" content="#f0f8ff">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administración de Préstamos</title>
+    <link rel="stylesheet" href="{% static 'libros/css/styles.css' %}">
+    <style>
+        /* Estilos CSS específicos para la página de préstamos */
+        h1 {
+            color: #343a40;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        h1 i {
+            margin-right: 0.5rem;
+            font-size: 2rem;
+            color: #007bff;
+        }
+
+        /* Botón de crear préstamo */
+        .btn-crear-prestamo {
+            background-color: #28a745; /* Verde */
+            color: white;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            font-size: 1.25rem; /* Botón más grande */
+            padding: .5rem 1rem;
+        }
+
+        .btn-crear-prestamo:hover {
+            background-color: #218838;
+        }
+
+        /* Estilos generales de los botones de la tabla */
+        .crud-actions button, .crud-actions a {
+            margin-right: 0.5rem;
+            border-radius: 0.2rem;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-warning {
+            background-color: #ffc107;
+            border-color: #ffc107;
+            color: #212529; /* Color de texto para el botón de editar */
+        }
+
+        .btn-warning:hover {
+            background-color: #e0a800;
+            border-color: #d39e00;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
+        }
+
+        /* Estilos para la tabla */
+        .table-responsive-custom {
+            max-height: 600px; /* Altura máxima para el scroll */
+            overflow-y: auto; /* Habilita el scroll vertical */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            border-radius: 0.25rem;
+            background-color: white;
+        }
+
+        .table-responsive-custom thead th {
+            position: sticky; /* Encabezado fijo */
+            top: 0;
+            background-color: #e9ecef; /* Color de fondo del encabezado */
+            z-index: 1;
+            font-weight: bold;
+            color: #343a40;
+            text-align: left;
+            padding: 0.75rem;
+        }
+
+        .table-responsive-custom tbody td {
+            vertical-align: middle;
+            padding: 0.75rem;
+        }
+
+        .table tbody tr:nth-child(even) {
+            background-color: #f8f9fa; /* Color de fondo para filas pares */
+        }
+
+        .table tbody tr:hover {
+            background-color: #e2e6ea; /* Color de fondo al pasar el ratón */
+        }
+
+        /* Ancho mínimo para la columna de acciones */
+        .table thead th.actions-column,
+        .table tbody td.crud-actions {
+            min-width: 170px; /* Ajusta este valor según necesites más espacio para los botones */
+        }
+
+        /* Estilos para los modales */
+        .modal-header-admin {
+            background-color: #007bff; /* Color azul para el encabezado del modal */
+            color: white;
+            border-bottom: 1px solid #0056b3;
+        }
+        .btn-close-white {
+            filter: invert(1); /* Pone la X en blanco */
+        }
+        /* Estilos para el modal de eliminación */
+        #modalEliminarPrestamo .modal-header-admin {
+            background-color: #dc3545; /* Rojo para el modal de eliminar */
+            border-bottom: 1px solid #c82333;
+        }
+
+        /* Estilos para el formulario de búsqueda */
+        .search-form {
+            margin-bottom: 1.5rem;
+            display: flex;
+        }
+
+        .search-input {
+            flex-grow: 1;
+            margin-right: 0.5rem;
+        }
+
+        .search-button {
+            flex-shrink: 0;
+        }
+
+        .error-messages {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    {# La barra de navegación ahora está fija en la parte superior #}
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top"> {# <-- Clase fixed-top añadida #}
+        <div class="container">
+            <a class="navbar-brand fw-bold d-flex align-items-center" href="#">
+                <img src="{% static 'libros/img/logo.png' %}"
+                     alt="Logo Institución"
+                     height="30"
+                     class="me-2">
+                Administración
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAdmin" aria-controls="navbarNavAdmin" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavAdmin">
+                {# Enlaces centrados en pantallas grandes #}
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'crear_libro' %}">
+                            <i class="fas fa-plus"></i> Agregar Libro
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'prestamos:lista_prestamos' %}">
+                            <i class="fas fa-exchange-alt"></i> Préstamos
+                        </a>
+                    </li>
+                </ul>
+
+                {# Menú desplegable para el usuario y Cerrar Sesión #}
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle"></i> Hola, {% if user.is_authenticated %}{{ user.username }}{% else %}Invitado{% endif %}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
+                            <li>
+                                <form method="post" action="{% url 'logout' %}" class="dropdown-item">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-link nav-link text-danger p-0 d-block text-start">
+                                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    {# Contenido principal de la página, con padding superior para evitar que se solape con la navbar fija #}
+    <div class="main-content pt-5"> {# <-- Clase pt-5 añadida aquí para el padding superior #}
+        <div class="container mt-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="fas fa-handshake"></i>Administración de Préstamos</h1>
+                <button class="btn btn-success btn-lg btn-crear-prestamo" data-bs-toggle="modal" data-bs-target="#modalNuevoPrestamo">
+                    <i class="fas fa-plus-circle"></i> Nuevo Préstamo
+                </button>
+            </div>
+
+            <form class="search-form" method="get" action="">
+                <input type="text"
+                       class="form-control search-input"
+                       name="q"
+                       placeholder="Buscar préstamos por libro, persona o RUT"
+                       value="{{ query|default:'' }}">
+                <button type="submit" class="btn btn-primary search-button"><i class="fas fa-search"></i> Buscar</button>
+            </form>
+
+            <div class="table-responsive-custom">
+                <table class="table table-bordered table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Libro</th>
+                            <th>Persona</th>
+                            <th>Curso</th>
+                            <th>RUT</th>
+                            <th>Celular</th>
+                            <th>Fecha Préstamo</th>
+                            <th>Fecha Devolución</th>
+                            <th class="text-center actions-column">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-prestamos-body">
+                        {% for prestamo in prestamos %}
+                            <tr id="prestamo-{{ prestamo.id }}">
+                                <td>{{ prestamo.libro.nombre }}</td>
+                                <td>{{ prestamo.nombre_persona }}</td>
+                                <td>{{ prestamo.get_curso_display }}</td> {# <-- ¡Aquí está el cambio! #}
+                                <td>{{ prestamo.rut }}</td>
+                                <td>{{ prestamo.celular }}</td>
+                                <td>{{ prestamo.fecha_prestamo|date:"Y-m-d" }}</td>
+                                <td>{{ prestamo.fecha_devolucion|date:"Y-m-d"|default:"Pendiente" }}</td>
+                                <td class="crud-actions text-center">
+                                    <button class="btn btn-sm btn-warning btn-editar-prestamo"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modalEditarPrestamo"
+                                            data-prestamo-id="{{ prestamo.id }}">
+                                        <i class="fas fa-edit"></i> Editar
+                                    </button>
+                                    <button class="btn btn-sm btn-danger btn-eliminar-prestamo"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modalEliminarPrestamo"
+                                            data-prestamo-id="{{ prestamo.id }}">
+                                        <i class="fas fa-trash-alt"></i> Eliminar
+                                    </button>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="8" class="text-center">No hay préstamos registrados.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {# Modales (Crear, Editar, Eliminar) - Revisados para asegurar correcta visualización #}
+            <div class="modal fade" id="modalNuevoPrestamo" tabindex="-1" aria-labelledby="modalNuevoPrestamoLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header modal-header-admin">
+                            <h5 class="modal-title" id="modalNuevoPrestamoLabel">Registrar Nuevo Préstamo</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="formNuevoPrestamo" method="post" action="{% url 'prestamos:crear_prestamo' %}">
+                                {% csrf_token %}
+                                {{ form.as_p }} {# <-- Aquí se deberían renderizar los campos #}
+                                <div id="form-errors" class="error-messages"></div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-primary">Registrar Préstamo</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="modalEditarPrestamo" tabindex="-1" aria-labelledby="modalEditarPrestamoLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header modal-header-admin">
+                            <h5 class="modal-title" id="modalEditarPrestamoLabel">Editar Préstamo</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="formEditarPrestamo" method="post" action="" data-url-editar="">
+                                {% csrf_token %}
+                                <div id="editar-form-fields">
+                                    {# Los campos del formulario de edición se cargarán aquí dinámicamente por JavaScript #}
+                                </div>
+                                <div id="editar-form-errors" class="error-messages">
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="modalEliminarPrestamo" tabindex="-1" aria-labelledby="modalEliminarPrestamoLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header modal-header-admin bg-danger">
+                            <h5 class="modal-title" id="modalEliminarPrestamoLabel">Confirmar Eliminación</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>¿Estás seguro de que deseas eliminar este préstamo?</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" id="btnCancelarEliminar" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="button" class="btn btn-danger" id="btnConfirmarEliminar">Sí, eliminar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block footer %}
+    {{ block.super }}
+{% endblock %}

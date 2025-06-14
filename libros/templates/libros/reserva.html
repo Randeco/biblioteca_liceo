@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Reservar {{ libro.nombre }}</title>
+</head>
+<body>
+    <h1>Reservar: {{ libro.nombre }}</h1>
+    <p>Autor: {{ libro.autor }}</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success">Confirmar Reserva</button>
+    </form>
+</body>
+</html>

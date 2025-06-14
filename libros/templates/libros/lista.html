@@ -1,0 +1,100 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <link rel="icon" href="{% static 'libros/img/icono.svg' %}" type="image/x-icon">
+    <link rel="shortcut icon" href="{% static 'libros/img/icono.svg' %}" type="image/x-icon">
+    <link rel="apple-touch-icon" href="{% static 'libros/img/icono.svg' %}">
+    <meta name="theme-color" content="#ffffff">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biblioteca Politécnico San Carlos - Listado de Libros</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'libros/css/styles.css' %}">
+    <style>
+        .hero-section {
+        background-image:
+            linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3)),
+            url('{% static "libros/img/estanteria.jpg" %}');
+        background-size: auto, cover; /* 'auto' para el degradado (se estira), 'cover' para la imagen */
+        background-position: center, center; /* Centrar ambos */
+        background-repeat: no-repeat; /* Evitar la repetición de la imagen */
+        min-height: 60vh;
+    }
+        .table-responsive-custom { /* Clase personalizada para la tabla */
+            max-height: 800px; /* Ajusta la altura máxima según tus necesidades */
+            overflow-y: auto; /* Muestra la barra de desplazamiento vertical cuando sea necesario */
+        }
+
+        .table-responsive-custom thead th {
+            position: sticky; /* Fija el encabezado en la parte superior al hacer scroll */
+            top: 0;
+            background-color: white; /* O el color de fondo de tu tabla */
+            z-index: 1; /* Asegura que el encabezado esté por encima del contenido al hacer scroll */
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        {% include 'libros/navbar.html' %}
+    </nav>
+
+    <section class="hero-section text-white text-center py-5">
+        <div class="container">
+            <h1>Catálogo de Libros Disponibles</h1>
+            <p class="lead">Explora nuestra colección y encuentra tu próxima lectura.</p>
+        </div>
+    </section>
+
+    <div class="container mt-4">
+        <form class="d-flex mb-3" action="{% url 'buscar_libros' %}" method="get">
+            <input class="form-control me-2" type="search" placeholder="Buscar libro..." aria-label="Search" name="q">
+            <button class="btn btn-outline-success" type="submit">Buscar</button>
+        </form>
+        <div class="table-responsive-custom">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Portada</th>
+                        <th>Título</th>
+                        <th>Autor</th>
+                        <th>Género</th>
+                        <th>Disponibilidad</th>
+                        <th>Stock</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for libro in libros %}
+                    <tr>
+                        <td>
+                            {% if libro.portada_url %}
+                                <img src="{{ libro.portada_url }}" alt="{{ libro.nombre }}" class="img-thumbnail" style="max-width: 50px; height: auto;">
+                            {% else %}
+                                <i class="fas fa-book fa-2x"></i> {% endif %}
+                        </td>
+                        <td>{{ libro.nombre }}</td>
+                        <td>{{ libro.autor }}</td>
+                        <td>{{ libro.genero }}</td>
+                        <td>
+                            {% if libro.disponibilidad %}
+                                <span class="badge bg-success">Disponible</span>
+                            {% else %}
+                                <span class="badge bg-danger">No Disponible</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ libro.stock }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <footer>
+        {% include 'libros/footer.html' %}
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
